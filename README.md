@@ -10,6 +10,17 @@ The API host is set in `src/lib/api.ts`. The backend lives at
 ## Develop
 
 ```bash
-npm install
+npm install        # also installs the git hooks (husky)
 npx expo start     # scan the QR code with Expo Go on Android
 ```
+
+## Checks
+
+```bash
+npm run lint       # ESLint (eslint-config-expo) + Prettier
+npm run typecheck  # tsc --noEmit
+npm run format     # Prettier --write
+```
+
+The pre-commit hook runs lint-staged: `eslint --fix` and Prettier on staged files, then a
+project-wide `tsc --noEmit`.

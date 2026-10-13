@@ -9,6 +9,7 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0f172a",
     "android": {
+      "package": "dev.sprytnyk.ip",
       "adaptiveIcon": {
         "backgroundColor": "#2B6CB0",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -31,6 +32,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "da71e14b-e357-4db0-a99c-7068d2081229"
+      }
+    },
+    "owner": "sprytnyks-team"
   }
 }

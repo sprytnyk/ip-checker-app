@@ -41,3 +41,7 @@ example
 # generated native folders
 /ios
 /android
+
+# Some global gitignores (e.g. gitignore.io's VirtualEnv template) ignore every
+# lib/ folder. Keep our source tracked regardless.
+!/src/lib/

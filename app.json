@@ -11,6 +11,12 @@
     "android": {
       "package": "dev.sprytnyk.ip",
       "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.VIBRATE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#2B6CB0",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -2,7 +2,8 @@
 
 Android app for [ip.sprytnyk.dev](https://ip.sprytnyk.dev), with the same design as the site. It shows your
 public IPv4 and IPv6 addresses, country, city and network organisation, runs a DNS leak test
-that lists the resolvers looking up names for you, and can look up any other address.
+that lists the resolvers looking up names for you and flags those outside your network, and
+can look up any other address.
 
 <p align="center">
   <img src="docs/screenshots/home.png" width="300" alt="Looking up 1.1.1.1: IPv4, country, city and organisation, with recent lookups below" />

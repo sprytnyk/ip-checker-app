@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Footer } from '@/components/footer';
 import { HistoryList } from '@/components/history-list';
+import { DnsLeakCard } from '@/components/dns-leak-card';
 import { ArrowLeftIcon } from '@/components/icons';
 import { ErrorCard, LookupCard, MyIpCard } from '@/components/location-card';
 import { SearchBar } from '@/components/search-bar';
@@ -88,6 +89,9 @@ export default function HomeScreen() {
           )}
           {renderCard()}
         </View>
+
+        {/* The leak test is about this device, so it's hidden while showing someone else's IP. */}
+        {!showingLookup && <DnsLeakCard state={myIp.resolvers} />}
 
         <HistoryList
           items={history.items}

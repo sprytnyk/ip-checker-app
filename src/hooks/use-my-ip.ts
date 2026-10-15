@@ -2,7 +2,14 @@ import { addNetworkStateListener } from 'expo-network';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
-import { ApiError, fetchLocation, type IpVersion, type Location, probeAddress } from '@/lib/api';
+import {
+  ApiError,
+  fetchLocation,
+  type IpVersion,
+  type Location,
+  probeAddress,
+  testDnsLeak,
+} from '@/lib/api';
 
 // Coming back to the app after at least this long triggers a fresh check.
 const STALE_AFTER_MS = 30_000;
@@ -15,8 +22,18 @@ export type MyIpState =
   | { status: 'error'; message: string }
   | { status: 'ready'; location: Location; addresses: Addresses };
 
+export type ResolversState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; resolvers: Location[] };
+
+function errorMessage(error: unknown) {
+  return error instanceof ApiError ? error.message : 'Something went wrong.';
+}
+
 export function useMyIp() {
   const [state, setState] = useState<MyIpState>({ status: 'loading' });
+  const [resolvers, setResolvers] = useState<ResolversState>({ status: 'loading' });
   const [refreshing, setRefreshing] = useState(false);
   // Each run gets an id so a slow, older response can't overwrite a newer one.
   const runId = useRef(0);
@@ -42,17 +59,25 @@ export function useMyIp() {
       },
       (error: unknown) => {
         if (!isCurrent()) return;
-        setState({
-          status: 'error',
-          message: error instanceof ApiError ? error.message : 'Something went wrong.',
-        });
+        setState({ status: 'error', message: errorMessage(error) });
         setRefreshing(false);
+      },
+    );
+
+    // The DNS leak test runs alongside; it takes a few seconds and doesn't hold the spinner.
+    testDnsLeak().then(
+      (found) => {
+        if (isCurrent()) setResolvers({ status: 'ready', resolvers: found });
+      },
+      (error: unknown) => {
+        if (isCurrent()) setResolvers({ status: 'error', message: errorMessage(error) });
       },
     );
   }
 
   function refresh() {
     setRefreshing(true);
+    setResolvers({ status: 'loading' });
     load();
   }
 
@@ -92,5 +117,5 @@ export function useMyIp() {
     };
   }, []);
 
-  return { state, refreshing, refresh };
+  return { state, resolvers, refreshing, refresh };
 }

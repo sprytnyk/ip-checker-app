@@ -10,6 +10,7 @@ export const Colors = {
   rowBackground: 'rgba(51, 65, 85, 0.5)',
   slate500: '#64748b',
   slate400: '#94a3b8',
+  slate300: '#cbd5e1',
   slate200: '#e2e8f0',
   white: '#ffffff',
   blue600: '#2563eb',

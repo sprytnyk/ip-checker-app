@@ -2,11 +2,17 @@
  * Client for the IP Location API. Schema: https://ip.sprytnyk.dev/openapi.json
  */
 
+import { getRandomBytes } from 'expo-crypto';
+
 export const API_HOST = 'ip.sprytnyk.dev';
 
 const REQUEST_TIMEOUT_MS = 10_000;
 // Same budget the site gives its ipv4./ipv6. probes.
 const PROBE_TIMEOUT_MS = 5_000;
+// The DNS leak test's zone, served by the API's own nameserver.
+const DNS_ZONE = `dns.${API_HOST}`;
+// Several lookups, so resolvers that share the load all show up. Same count as the site.
+const DNS_LOOKUPS = 6;
 
 export type IpVersion = 4 | 6;
 
@@ -34,16 +40,15 @@ export class ApiError extends Error {
   }
 }
 
-async function getJson<T>(url: string, timeoutMs: number): Promise<T> {
+async function fetchWithTimeout(
+  url: string,
+  timeoutMs: number,
+  init?: RequestInit,
+): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
-  let response: Response;
   try {
-    response = await fetch(url, {
-      cache: 'no-store',
-      headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
-      signal: controller.signal,
-    });
+    return await fetch(url, { cache: 'no-store', ...init, signal: controller.signal });
   } catch {
     throw new ApiError(
       controller.signal.aborted
@@ -53,6 +58,12 @@ async function getJson<T>(url: string, timeoutMs: number): Promise<T> {
   } finally {
     clearTimeout(timer);
   }
+}
+
+async function getJson<T>(url: string, timeoutMs: number): Promise<T> {
+  const response = await fetchWithTimeout(url, timeoutMs, {
+    headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+  });
 
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
@@ -94,4 +105,26 @@ export async function probeAddress(version: IpVersion): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * DNS leak test: looks up random names under dns.<host>, whose nameserver records which
+ * resolvers asked, then fetches that list from GET /api/dns/{id}/. The lookups fail with
+ * NXDOMAIN by design; only the query matters. Resolves to the resolvers seen, with their
+ * location details.
+ */
+export async function testDnsLeak(): Promise<Location[]> {
+  // 32 random hex digits, the id format the server expects.
+  const bytes = Array.from(getRandomBytes(16), (byte) => byte.toString(16).padStart(2, '0'));
+  const testId = bytes.join('');
+  await Promise.allSettled(
+    Array.from({ length: DNS_LOOKUPS }, (_, n) =>
+      fetchWithTimeout(`https://${testId}-${n}.${DNS_ZONE}/`, PROBE_TIMEOUT_MS),
+    ),
+  );
+  const data = await getJson<{ resolvers: Location[] }>(
+    `https://${API_HOST}/api/dns/${testId}/`,
+    REQUEST_TIMEOUT_MS,
+  );
+  return data.resolvers;
 }

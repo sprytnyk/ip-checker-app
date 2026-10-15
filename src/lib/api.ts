@@ -25,6 +25,17 @@ export type Location = {
   org: string;
 };
 
+export type DnsResolver = Location & {
+  /** Whether the resolver is on the requester's network (ASN organisation); null if unknown. */
+  same_network: boolean | null;
+};
+
+export type DnsLeakResult = {
+  /** True if any resolver is on another network, null if that can't be told. */
+  leak: boolean | null;
+  resolvers: DnsResolver[];
+};
+
 type Address = {
   ip: string;
   version: IpVersion;
@@ -110,10 +121,10 @@ export async function probeAddress(version: IpVersion): Promise<string | null> {
 /**
  * DNS leak test: looks up random names under dns.<host>, whose nameserver records which
  * resolvers asked, then fetches that list from GET /api/dns/{id}/. The lookups fail with
- * NXDOMAIN by design; only the query matters. Resolves to the resolvers seen, with their
- * location details.
+ * NXDOMAIN by design; only the query matters. The server compares each resolver's network
+ * with the one of the address that fetches the list, so this must come from the device itself.
  */
-export async function testDnsLeak(): Promise<Location[]> {
+export async function testDnsLeak(): Promise<DnsLeakResult> {
   // 32 random hex digits, the id format the server expects.
   const bytes = Array.from(getRandomBytes(16), (byte) => byte.toString(16).padStart(2, '0'));
   const testId = bytes.join('');
@@ -122,9 +133,5 @@ export async function testDnsLeak(): Promise<Location[]> {
       fetchWithTimeout(`https://${testId}-${n}.${DNS_ZONE}/`, PROBE_TIMEOUT_MS),
     ),
   );
-  const data = await getJson<{ resolvers: Location[] }>(
-    `https://${API_HOST}/api/dns/${testId}/`,
-    REQUEST_TIMEOUT_MS,
-  );
-  return data.resolvers;
+  return getJson<DnsLeakResult>(`https://${API_HOST}/api/dns/${testId}/`, REQUEST_TIMEOUT_MS);
 }

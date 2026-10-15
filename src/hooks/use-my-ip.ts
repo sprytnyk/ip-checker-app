@@ -4,6 +4,7 @@ import { AppState } from 'react-native';
 
 import {
   ApiError,
+  type DnsLeakResult,
   fetchLocation,
   type IpVersion,
   type Location,
@@ -25,7 +26,7 @@ export type MyIpState =
 export type ResolversState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; resolvers: Location[] };
+  | { status: 'ready'; result: DnsLeakResult };
 
 function errorMessage(error: unknown) {
   return error instanceof ApiError ? error.message : 'Something went wrong.';
@@ -66,8 +67,8 @@ export function useMyIp() {
 
     // The DNS leak test runs alongside; it takes a few seconds and doesn't hold the spinner.
     testDnsLeak().then(
-      (found) => {
-        if (isCurrent()) setResolvers({ status: 'ready', resolvers: found });
+      (result) => {
+        if (isCurrent()) setResolvers({ status: 'ready', result });
       },
       (error: unknown) => {
         if (isCurrent()) setResolvers({ status: 'error', message: errorMessage(error) });

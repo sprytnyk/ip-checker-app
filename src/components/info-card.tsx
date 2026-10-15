@@ -4,7 +4,16 @@ import { Pressable, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { CopyIcon } from '@/components/icons';
-import { type Accent, Accents, CardShadow, Colors, Radius, Spacing } from '@/constants/theme';
+import {
+  type Accent,
+  Accents,
+  CardShadow,
+  Colors,
+  Radius,
+  Spacing,
+  type Tone,
+  Tones,
+} from '@/constants/theme';
 
 /**
  * The site's `.card`, with an optional `.card-title` and `.card-note` above the rows;
@@ -36,6 +45,8 @@ type InfoRowProps = {
   icon: ComponentType<{ color: string }>;
   accent: Accent;
   label: string;
+  /** A pill after the label, like the site's `.badge`. */
+  badge?: { text: string; tone: Tone };
   value: string;
   /** A smaller line under the value, like the site's `.row-detail`. */
   detail?: string;
@@ -48,6 +59,7 @@ export function InfoRow({
   icon: Icon,
   accent,
   label,
+  badge,
   value,
   detail,
   muted,
@@ -71,7 +83,18 @@ export function InfoRow({
         <Icon color={colors.icon} />
       </View>
       <View style={styles.rowContent}>
-        <Text style={styles.rowLabel}>{label}</Text>
+        <View style={styles.rowLabelLine}>
+          <Text style={styles.rowLabel}>{label}</Text>
+          {badge !== undefined && (
+            <Text
+              style={[
+                styles.badge,
+                { backgroundColor: Tones[badge.tone].badge, color: Tones[badge.tone].text },
+              ]}>
+              {badge.text}
+            </Text>
+          )}
+        </View>
         <Text style={[styles.rowValue, muted && styles.muted]} selectable={!copyable}>
           {value}
         </Text>
@@ -143,12 +166,26 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
+  rowLabelLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    marginBottom: Spacing.one,
+  },
   rowLabel: {
     fontSize: 14,
     lineHeight: 21,
     fontWeight: '500',
     color: Colors.slate400,
-    marginBottom: Spacing.one,
+  },
+  badge: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '600',
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 2,
+    borderRadius: 999,
+    overflow: 'hidden',
   },
   rowValue: {
     fontSize: 17.6,

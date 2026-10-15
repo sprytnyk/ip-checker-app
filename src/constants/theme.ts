@@ -30,6 +30,30 @@ export const Accents = {
 
 export type Accent = keyof typeof Accents;
 
+/** DNS leak verdict and network badge colors, as in the site's `.verdict.*` and `.badge.*`. */
+export const Tones = {
+  ok: {
+    background: 'rgba(16, 185, 129, 0.1)',
+    border: 'rgba(16, 185, 129, 0.4)',
+    badge: Accents.emerald.tile,
+    text: Accents.emerald.icon,
+  },
+  leak: {
+    background: 'rgba(244, 63, 94, 0.1)',
+    border: 'rgba(244, 63, 94, 0.4)',
+    badge: Accents.rose.tile,
+    text: Accents.rose.icon,
+  },
+  unknown: {
+    background: 'rgba(148, 163, 184, 0.1)',
+    border: 'rgba(148, 163, 184, 0.4)',
+    badge: 'rgba(148, 163, 184, 0.2)',
+    text: Colors.slate300,
+  },
+} as const;
+
+export type Tone = keyof typeof Tones;
+
 export const PageGradient = `linear-gradient(to bottom right, ${Colors.slate900}, ${Colors.slate800}, ${Colors.slate900})`;
 
 export const CardShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';

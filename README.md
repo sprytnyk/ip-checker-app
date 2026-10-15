@@ -1,8 +1,8 @@
 # What's My IP
 
 Android app for [ip.sprytnyk.dev](https://ip.sprytnyk.dev), with the same design as the site. It shows your
-public IPv4 and IPv6 addresses, country, city and network organisation, and can look up any
-other address.
+public IPv4 and IPv6 addresses, country, city and network organisation, runs a DNS leak test
+that lists the resolvers looking up names for you, and can look up any other address.
 
 <p align="center">
   <img src="docs/screenshots/home.png" width="300" alt="Looking up 1.1.1.1: IPv4, country, city and organisation, with recent lookups below" />
@@ -13,8 +13,9 @@ other address.
 Neither the app nor its backend collects your data.
 
 - **No tracking.** No analytics, ads, crash reporting or accounts.
-- **One server.** The app only talks to `ip.sprytnyk.dev` and its `ipv4.`/`ipv6.` subdomains.
-  Footer links open in a browser only when you tap them.
+- **One server.** The app only talks to `ip.sprytnyk.dev` and its `ipv4.`/`ipv6.` subdomains,
+  and the DNS leak test looks up random names under its `dns.` subdomain, which the backend's
+  own nameserver answers. Footer links open in a browser only when you tap them.
 - **Local GeoIP.** The [backend](https://github.com/sprytnyk/ip) answers from local MaxMind
   GeoLite2 databases, so your address is never passed on to a third-party lookup service.
 - **History stays on your phone.** Recent lookups are stored on the device only, and you can

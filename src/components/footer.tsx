@@ -1,10 +1,13 @@
+import Constants from 'expo-constants';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { ExternalLink } from '@/components/external-link';
-import { Colors } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { API_HOST } from '@/lib/api';
 
-/** The site's footer, word for word. */
+const APP_VERSION = Constants.expoConfig?.version;
+
+/** The site's footer, word for word, plus the app's version. */
 export function Footer() {
   return (
     <View>
@@ -31,6 +34,9 @@ export function Footer() {
         </ExternalLink>
         .
       </Text>
+      {APP_VERSION !== undefined && (
+        <Text style={[styles.line, styles.version]}>Version {APP_VERSION}</Text>
+      )}
     </View>
   );
 }
@@ -44,5 +50,9 @@ const styles = StyleSheet.create({
   },
   link: {
     color: Colors.link,
+  },
+  version: {
+    marginTop: Spacing.two,
+    color: Colors.slate500,
   },
 });

@@ -85,14 +85,13 @@ export function InfoRow({
       <View style={styles.rowContent}>
         <View style={styles.rowLabelLine}>
           <Text style={styles.rowLabel}>{label}</Text>
+          {/* The pill is a View: padding and clipping on an Android Text can cut its glyphs. */}
           {badge !== undefined && (
-            <Text
-              style={[
-                styles.badge,
-                { backgroundColor: Tones[badge.tone].badge, color: Tones[badge.tone].text },
-              ]}>
-              {badge.text}
-            </Text>
+            <View style={[styles.badge, { backgroundColor: Tones[badge.tone].badge }]}>
+              <Text style={[styles.badgeText, { color: Tones[badge.tone].text }]} numberOfLines={1}>
+                {badge.text}
+              </Text>
+            </View>
           )}
         </View>
         <Text style={[styles.rowValue, muted && styles.muted]} selectable={!copyable}>
@@ -179,13 +178,15 @@ const styles = StyleSheet.create({
     color: Colors.slate400,
   },
   badge: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '600',
+    flexShrink: 0,
     paddingHorizontal: Spacing.two,
     paddingVertical: 2,
     borderRadius: 999,
-    overflow: 'hidden',
+  },
+  badgeText: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '600',
   },
   rowValue: {
     fontSize: 17.6,

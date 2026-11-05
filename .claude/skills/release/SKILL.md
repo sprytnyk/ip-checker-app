@@ -15,9 +15,9 @@ release notes.
 Stop and report back if any step fails. Don't work around a failure.
 
 The project uses npm (`package-lock.json`) and Node.js 26 (`.nvmrc`), so run tools with
-`npx`. Every commit in this repo is GPG-signed, but git config doesn't sign them on its own.
-Pass `-S` to every `git commit`. Before pushing, `git log --format='%h %G? %s' <last-tag>..HEAD`
-must show `G` for each commit.
+`npx`.
+
+Sign only the version commit and its tag (step 3). Leave every other commit unsigned.
 
 `gh` is installed and logged in. Use it to publish the GitHub release.
 
@@ -31,17 +31,18 @@ must show `G` for each commit.
   installed, expected) and ask the user whether to update them now. Don't continue the
   release until they answer.
   - **Yes:** run `npx expo install --fix`. `git diff --stat` should show only `package.json`
-    and `package-lock.json`. Run `npx expo-doctor` again, then commit (signed, hook runs) as
-    `build(deps): update expo sdk <major> patch versions`. The update ships in this release
-    and goes under Other in the notes.
+    and `package-lock.json`. Run `npx expo-doctor` again, then make an unsigned commit,
+    `build(deps): update expo sdk <major> patch versions`, and let the hook run. The update
+    ships in this release and goes under Other in the notes.
   - **No:** keep the current versions and list the outdated packages in the report.
 - `gh repo view --json nameWithOwner --jq .nameWithOwner` must print
   `sprytnyk/ip-checker-app`. If `gh` is missing or not logged in, stop and ask the user to
   fix it before you tag anything.
-- **Uncommitted work** gets committed first. Make one Conventional Commit per logical change
-  and let the husky pre-commit hook run. It runs eslint and prettier on the staged files, then
-  `tsc --noEmit`. Never stage secret files, `dist/` or scratch files. If you're not sure a
-  change belongs in the release, ask. Ask about untracked files under `.claude/` too.
+- **Uncommitted work** gets committed first. Make one unsigned Conventional Commit per logical
+  change, and let the husky pre-commit hook run. It runs eslint and prettier on the staged
+  files, then `tsc --noEmit`. Never stage secret files, `dist/` or scratch files. If you're
+  not sure a change belongs in the release, ask. Ask about untracked files under `.claude/`
+  too.
 - Run the checks. All three must pass, except for version mismatches the user chose to keep:
   ```bash
   npm run lint

@@ -15,7 +15,9 @@ release notes.
 Stop and report back if any step fails. Don't work around a failure.
 
 The project uses npm (`package-lock.json`) and Node.js 26 (`.nvmrc`), so run tools with
-`npx`. Commits in this repo are GPG-signed by the user's git config. Leave that as it is.
+`npx`. Every commit in this repo is GPG-signed, but git config doesn't sign them on its own.
+Pass `-S` to every `git commit`. Before pushing, `git log --format='%h %G? %s' <last-tag>..HEAD`
+must show `G` for each commit.
 
 `gh` is installed and logged in. Use it to publish the GitHub release.
 
@@ -28,7 +30,7 @@ The project uses npm (`package-lock.json`) and Node.js 26 (`.nvmrc`), so run too
   installed, expected) and ask the user whether to update them now. Don't continue the
   release until they answer.
   - **Yes:** run `npx expo install --fix`. `git diff --stat` should show only `package.json`
-    and `package-lock.json`. Run `npx expo-doctor` again, then commit (hook runs) as
+    and `package-lock.json`. Run `npx expo-doctor` again, then commit (signed, hook runs) as
     `build(deps): update expo sdk <major> patch versions`. The update ships in this release
     and goes under Other in the notes.
   - **No:** keep the current versions and list the outdated packages in the report.
@@ -61,7 +63,9 @@ The project uses npm (`package-lock.json`) and Node.js 26 (`.nvmrc`), so run too
   - `app.json`: `expo.version`
   - `package.json`: `version`
   - `package-lock.json`: the top-level `version` and `packages[""].version`
-- Don't touch `android.versionCode`. EAS increments it remotely (`appVersionSource: remote`).
+- Don't touch `android.versionCode`. EAS stores it (`appVersionSource: remote`), and only the
+  `production` profile raises it. The `preview` profile used here leaves it at 1, as in every
+  release so far. Android still installs the APK as an update, since the number doesn't go down.
 - Check the bump: `git diff --stat` should show only those three files, with 4 insertions
   and 4 deletions.
 
@@ -101,8 +105,8 @@ If either push is rejected, stop and ask. Never force-push.
 
 `eas build --local` builds the APK on this machine. It runs the same steps as an EAS cloud
 build, from the committed tree, and doesn't use the gitignored `android/` folder. EAS still
-signs it with the keystore it manages, downloaded just for the build, and still bumps
-`versionCode` remotely. The only traffic to EAS is checking the project and fetching that
+signs it with the keystore it manages, downloaded just for the build, and reads `versionCode`
+from EAS. The only traffic to EAS is checking the project and fetching that
 keystore. Releases up to v1.2.1 were built in the EAS cloud with that same keystore.
 
 **Toolchain.** It isn't in the shell profile, so pass it on the command line:

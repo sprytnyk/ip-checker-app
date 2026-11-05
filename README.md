@@ -26,6 +26,8 @@ Neither the app nor its backend collects your data.
 
 ## Develop
 
+You need Node.js 26.
+
 ```bash
 npm install        # also installs the git hooks (husky)
 npx expo start     # scan the QR code with Expo Go on Android

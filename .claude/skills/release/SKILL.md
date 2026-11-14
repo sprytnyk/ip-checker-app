@@ -1,6 +1,6 @@
 ---
 name: release
-description: Ship a new version of What's My IP (ip-checker-app). Bumps the version, makes a signed version commit and tag, pushes, builds the APK on this machine with `eas build --local`, writes and signs SHA256SUMS in dist/, writes the release notes there too, and publishes the GitHub release with gh. Use when the user asks to release, ship, or "ship it as usual".
+description: Ship a new version of What's My IP (ip-checker-app). Bumps the version, makes a signed release commit and tag, pushes, builds the APK on this machine with `eas build --local`, writes and signs SHA256SUMS in dist/, writes the release notes there too, and publishes the GitHub release with gh. Use when the user asks to release, ship, or "ship it as usual".
 argument-hint: '[version, e.g. 1.2.2; derived from commits if omitted]'
 disable-model-invocation: true
 ---
@@ -17,7 +17,7 @@ Stop and report back if any step fails. Don't work around a failure.
 The project uses npm (`package-lock.json`) and Node.js 26 (`.nvmrc`), so run tools with
 `npx`.
 
-Sign only the version commit and its tag (step 3). Leave every other commit unsigned.
+Sign only the release commit and its tag (step 3). Leave every other commit unsigned.
 
 `gh` is installed and logged in. Use it to publish the GitHub release.
 
@@ -71,16 +71,16 @@ Sign only the version commit and its tag (step 3). Leave every other commit unsi
 - Check the bump: `git diff --stat` should show only those three files, with 4 insertions
   and 4 deletions.
 
-## 3. Version commit and signed tag
+## 3. Release commit and signed tag
 
 ```bash
 git add app.json package.json package-lock.json
-git commit -S -m "chore: bump version to X.Y.Z"
+git commit -S -m "chore(release): X.Y.Z"
 git tag -s vX.Y.Z -F <scratchpad>/tag-message.txt
 git verify-commit HEAD && git tag -v vX.Y.Z
 ```
 
-The commit message is just `chore: bump version to X.Y.Z`, with no body and no trailers.
+The commit message is just `chore(release): X.Y.Z`, with no body and no trailers.
 
 The tag message is the tag name, a blank line, then one short line per user-visible change
 since the last tag, as in `git cat-file -p v1.2.1`:

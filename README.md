@@ -1,5 +1,7 @@
 # What's My IP
 
+![AI Generated](https://img.shields.io/badge/AI-generated-orange)
+
 Android app for [ip.sprytnyk.dev](https://ip.sprytnyk.dev), with the same design as the site. It shows your
 public IPv4 and IPv6 addresses, country, city and network organisation, and it can look up any
 other address. Its DNS leak test lists the resolvers that look up names for you and flags the

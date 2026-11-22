@@ -6,8 +6,8 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ipcheckerapp",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#0f172a",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#020617",
     "android": {
       "package": "dev.sprytnyk.ip",
       "allowBackup": false,
@@ -29,9 +29,13 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0f172a",
+          "backgroundColor": "#f8fafc",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 96
+          "imageWidth": 96,
+          "dark": {
+            "backgroundColor": "#020617",
+            "image": "./assets/images/splash-icon.png"
+          }
         }
       ],
       "expo-sqlite"

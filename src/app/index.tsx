@@ -1,18 +1,23 @@
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Backdrop } from '@/components/backdrop';
+import { PillButton } from '@/components/card';
+import { DnsLeakCard } from '@/components/dns-leak-card';
 import { Footer } from '@/components/footer';
 import { HistoryList } from '@/components/history-list';
-import { DnsLeakCard } from '@/components/dns-leak-card';
 import { ArrowLeftIcon } from '@/components/icons';
 import { ErrorCard, LookupCard, MyIpCard } from '@/components/location-card';
 import { SearchBar } from '@/components/search-bar';
-import { Colors, PageGradient, Spacing } from '@/constants/theme';
+import { TOP_BAR_HEIGHT, TopBar } from '@/components/top-bar';
+import { Spacing, themedStyles, useColors } from '@/constants/theme';
 import { useLookup } from '@/hooks/use-lookup';
 import { useLookupHistory } from '@/hooks/use-lookup-history';
 import { useMyIp } from '@/hooks/use-my-ip';
 
 export default function HomeScreen() {
+  const styles = useStyles();
+  const colors = useColors();
   const insets = useSafeAreaInsets();
   const myIp = useMyIp();
   const lookup = useLookup();
@@ -22,6 +27,7 @@ export default function HomeScreen() {
   const refreshing = showingLookup
     ? lookup.state.status === 'loading'
     : myIp.refreshing && myIp.state.status !== 'loading';
+  const topBar = insets.top + TOP_BAR_HEIGHT;
 
   async function search(ip: string) {
     const location = await lookup.lookup(ip);
@@ -55,37 +61,31 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.background}>
+    <View style={styles.screen}>
+      <Backdrop />
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[
           styles.page,
-          { paddingTop: insets.top + Spacing.six, paddingBottom: insets.bottom + Spacing.six },
+          { paddingTop: topBar + Spacing.six, paddingBottom: insets.bottom + Spacing.six },
         ]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            progressViewOffset={insets.top}
-            colors={[Colors.link]}
-            progressBackgroundColor={Colors.slate800}
+            progressViewOffset={topBar}
+            colors={[colors.accent]}
+            progressBackgroundColor={colors.bg}
           />
         }>
-        <Text style={styles.title} accessibilityRole="header">
-          What&apos;s My IP
-        </Text>
-
         <SearchBar onSubmit={search} busy={lookup.state.status === 'loading'} />
 
         <View style={styles.cardSection}>
           {showingLookup && (
-            <Pressable
-              onPress={lookup.reset}
-              accessibilityRole="button"
-              style={({ pressed }) => [styles.backChip, pressed && styles.backChipPressed]}>
-              <ArrowLeftIcon color={Colors.link} size={16} />
-              <Text style={styles.backChipText}>Back to my IP</Text>
-            </Pressable>
+            <PillButton onPress={lookup.reset} style={styles.back}>
+              <ArrowLeftIcon color={colors.label} size={16} />
+              <Text style={styles.backText}>Back to my IP</Text>
+            </PillButton>
           )}
           {renderCard()}
         </View>
@@ -102,15 +102,15 @@ export default function HomeScreen() {
 
         <Footer />
       </ScrollView>
+      <TopBar />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  background: {
+const useStyles = themedStyles((c) => ({
+  screen: {
     flex: 1,
-    backgroundColor: Colors.slate900,
-    experimental_backgroundImage: PageGradient,
+    backgroundColor: c.bg,
   },
   page: {
     flexGrow: 1,
@@ -118,37 +118,18 @@ const styles = StyleSheet.create({
     maxWidth: 672,
     alignSelf: 'center',
     paddingHorizontal: Spacing.four,
-    gap: Spacing.six,
-  },
-  title: {
-    fontSize: 36,
-    lineHeight: 40,
-    fontWeight: '700',
-    color: Colors.white,
-    textAlign: 'center',
-    marginBottom: Spacing.four,
+    gap: Spacing.three,
   },
   cardSection: {
     gap: Spacing.three,
   },
-  backChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  back: {
     alignSelf: 'flex-start',
-    gap: Spacing.two,
     paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    backgroundColor: Colors.slate800,
-    borderWidth: 1,
-    borderColor: Colors.slate700,
-    borderRadius: 999,
   },
-  backChipPressed: {
-    backgroundColor: Colors.slate700,
+  backText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: c.label,
   },
-  backChipText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.link,
-  },
-});
+}));

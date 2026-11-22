@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
+import { Card, CardHeading, Item } from '@/components/card';
 import { ClockIcon, XIcon } from '@/components/icons';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Fonts, Spacing, themedStyles, useColors } from '@/constants/theme';
 
 type Props = {
   items: string[];
@@ -11,81 +12,66 @@ type Props = {
 };
 
 export function HistoryList({ items, onSelect, onRemove, onClear }: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   if (items.length === 0) return null;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Recent lookups</Text>
-        <Pressable onPress={onClear} hitSlop={8} accessibilityRole="button">
-          {({ pressed }) => (
-            <Text style={[styles.clear, pressed && styles.clearPressed]}>Clear all</Text>
-          )}
-        </Pressable>
-      </View>
-      {items.map((ip) => (
-        <Pressable
-          key={ip}
-          onPress={() => onSelect(ip)}
-          accessibilityRole="button"
-          accessibilityHint="Looks up this address again"
-          style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}>
-          <ClockIcon color={Colors.slate500} size={18} />
-          <Text style={styles.ip} numberOfLines={1} ellipsizeMode="middle">
-            {ip}
-          </Text>
-          <Pressable
-            onPress={() => onRemove(ip)}
-            hitSlop={10}
-            accessibilityRole="button"
-            accessibilityLabel={`Remove ${ip} from history`}>
-            <XIcon color={Colors.slate500} size={18} />
+    <Card delay={100}>
+      <CardHeading
+        icon={ClockIcon}
+        title="Recent lookups"
+        note="Kept only on this phone."
+        action={
+          <Pressable onPress={onClear} hitSlop={8} accessibilityRole="button">
+            {({ pressed }) => (
+              <Text style={[styles.clear, pressed && styles.clearPressed]}>Clear all</Text>
+            )}
           </Pressable>
-        </Pressable>
-      ))}
-    </View>
+        }
+      />
+      <View style={styles.items}>
+        {items.map((ip) => (
+          <Item
+            key={ip}
+            onPress={() => onSelect(ip)}
+            accessibilityHint="Looks up this address again">
+            <Text style={styles.ip} numberOfLines={1} ellipsizeMode="middle">
+              {ip}
+            </Text>
+            <Pressable
+              onPress={() => onRemove(ip)}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel={`Remove ${ip} from history`}>
+              <XIcon color={colors.muted} size={17} />
+            </Pressable>
+          </Item>
+        ))}
+      </View>
+    </Card>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+const useStyles = themedStyles((c) => ({
+  items: {
     gap: Spacing.two,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.one,
-    marginBottom: Spacing.one,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.slate400,
-  },
   clear: {
-    fontSize: 14,
-    color: Colors.link,
+    fontSize: 13,
+    lineHeight: 20,
+    fontWeight: '600',
+    color: c.link,
   },
   clearPressed: {
-    color: Colors.linkPressed,
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
-    backgroundColor: Colors.rowBackground,
-    borderRadius: Radius.row,
-  },
-  itemPressed: {
-    backgroundColor: Colors.slate700,
+    opacity: 0.6,
   },
   ip: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.slate200,
+    fontFamily: Fonts.mono,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: '600',
+    color: c.strong,
   },
-});
+}));

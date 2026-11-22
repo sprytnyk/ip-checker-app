@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { ServerIcon } from '@/components/icons';
-import { InfoCard, InfoRow } from '@/components/info-card';
-import { Colors, Radius, Spacing, type Tone, Tones } from '@/constants/theme';
+import { Badge, Card, CardHeading, copy, Item, Tag, type Tone, Verdict } from '@/components/card';
+import { ResolversIcon } from '@/components/icons';
+import { Fonts, Spacing, themedStyles } from '@/constants/theme';
 import type { ResolversState } from '@/hooks/use-my-ip';
 import type { DnsLeakResult, DnsResolver } from '@/lib/api';
 
@@ -16,32 +16,50 @@ const NOTE =
  */
 export function DnsLeakCard({ state }: { state: ResolversState }) {
   return (
-    <InfoCard key={state.status} title="DNS resolvers" note={NOTE}>
+    <Card key={state.status} delay={50}>
+      <CardHeading icon={ResolversIcon} title="DNS resolvers" note={NOTE} />
       {state.status === 'loading' && <Message text="Checking…" />}
       {state.status === 'error' && <Message text={state.message} />}
       {state.status === 'ready' && <Results result={state.result} />}
-    </InfoCard>
+    </Card>
   );
 }
 
 function Results({ result: { leak, resolvers } }: { result: DnsLeakResult }) {
+  const styles = useStyles();
   if (resolvers.length === 0) return <Message text="No resolvers detected" />;
   return (
-    <>
-      <Verdict leak={leak} resolvers={resolvers} />
+    <View style={styles.items}>
+      <VerdictBanner leak={leak} resolvers={resolvers} />
       {resolvers.map((resolver) => (
-        <InfoRow
-          key={resolver.ip}
-          icon={ServerIcon}
-          accent="blue"
-          label={`IPv${resolver.version}`}
-          badge={networkBadge(resolver)}
-          value={resolver.ip}
-          detail={`${resolver.city}, ${resolver.country} (${resolver.iso_code}) · ${resolver.org}`}
-          copyable
-        />
+        <Resolver key={resolver.ip} resolver={resolver} />
       ))}
-    </>
+    </View>
+  );
+}
+
+/** Tag and address on one line, the location under them, then the badge. */
+function Resolver({ resolver }: { resolver: DnsResolver }) {
+  const styles = useStyles();
+  const badge = networkBadge(resolver);
+  return (
+    <Item
+      onPress={() => copy(resolver.ip)}
+      accessibilityHint="Copies the address"
+      style={styles.resolver}>
+      <Tag text={`IPv${resolver.version}`} />
+      <View style={styles.resolverText}>
+        <Text style={styles.ip}>{resolver.ip}</Text>
+        <Text style={styles.detail}>
+          {`${resolver.city}, ${resolver.country} (${resolver.iso_code}) · ${resolver.org}`}
+        </Text>
+        {badge !== undefined && (
+          <View style={styles.badge}>
+            <Badge {...badge} />
+          </View>
+        )}
+      </View>
+    </Item>
   );
 }
 
@@ -52,7 +70,7 @@ function networkBadge({ same_network }: DnsResolver) {
 }
 
 /** The site's verdict banner, word for word. */
-function Verdict({ leak, resolvers }: DnsLeakResult) {
+function VerdictBanner({ leak, resolvers }: DnsLeakResult) {
   let tone: Tone;
   let title: string;
   let text: string;
@@ -77,53 +95,56 @@ function Verdict({ leak, resolvers }: DnsLeakResult) {
     title = "Can't tell whether DNS leaks";
     text = "Some addresses aren't in the GeoIP database, so their networks can't be compared.";
   }
-
-  const colors = Tones[tone];
   return (
-    <View
-      style={[styles.verdict, { backgroundColor: colors.background, borderColor: colors.border }]}>
-      <Text style={[styles.verdictTitle, { color: colors.text }]} accessibilityRole="header">
-        {title}
-      </Text>
-      <Text style={styles.verdictText}>{text}</Text>
+    <View style={useStyles().verdict}>
+      <Verdict tone={tone} title={title} text={text} />
     </View>
   );
 }
 
 function Message({ text }: { text: string }) {
+  const styles = useStyles();
   return (
-    <View style={styles.row}>
-      <Text style={styles.text}>{text}</Text>
-    </View>
+    <Item>
+      <Text style={styles.message}>{text}</Text>
+    </Item>
   );
 }
 
-const styles = StyleSheet.create({
-  verdict: {
-    padding: Spacing.four,
-    borderRadius: Radius.row,
-    borderWidth: 1,
+const useStyles = themedStyles((c) => ({
+  items: {
+    gap: Spacing.two,
   },
-  verdictTitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '600',
+  verdict: {
     marginBottom: Spacing.one,
   },
-  verdictText: {
-    fontSize: 14,
-    lineHeight: 21,
-    color: Colors.slate300,
+  resolver: {
+    alignItems: 'flex-start',
   },
-  row: {
-    padding: Spacing.four,
-    backgroundColor: Colors.rowBackground,
-    borderRadius: Radius.row,
+  resolverText: {
+    flex: 1,
+    minWidth: 0,
   },
-  text: {
-    fontSize: 17.6,
-    lineHeight: 26,
+  ip: {
+    fontFamily: Fonts.mono,
+    fontSize: 16,
+    lineHeight: 22,
     fontWeight: '600',
-    color: Colors.slate400,
+    color: c.strong,
   },
-});
+  detail: {
+    marginTop: 2,
+    fontSize: 13,
+    lineHeight: 19,
+    color: c.muted,
+  },
+  badge: {
+    marginTop: 6,
+  },
+  message: {
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: '500',
+    color: c.muted,
+  },
+}));

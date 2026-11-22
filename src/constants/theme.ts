@@ -1,62 +1,110 @@
 /**
- * Colors and sizes mirror the CSS of https://ip.sprytnyk.dev (templates/index.html),
- * which uses the Tailwind slate palette. The site is dark only, and so is the app.
+ * Colors and sizes mirror static/style.css of https://ip.sprytnyk.dev: a soft blue glow and a
+ * faint dot grid behind the page, see-through cards, blue and slate, in light and dark.
  */
 
-export const Colors = {
-  slate900: '#0f172a',
-  slate800: '#1e293b',
-  slate700: '#334155',
-  rowBackground: 'rgba(51, 65, 85, 0.5)',
-  slate500: '#64748b',
-  slate400: '#94a3b8',
-  slate300: '#cbd5e1',
-  slate200: '#e2e8f0',
-  white: '#ffffff',
-  blue600: '#2563eb',
-  link: '#60a5fa',
-  linkPressed: '#93c5fd',
-  error: '#fb7185',
+import { StyleSheet, useColorScheme } from 'react-native';
+
+const light = {
+  bg: '#f8fafc',
+  glow: '#2563eb1f',
+  dots: '#0f172a14',
+  ink: '#1e293b',
+  strong: '#020617',
+  muted: '#64748b',
+  label: '#334155',
+  line: '#0f172a14',
+  lineStrong: '#0f172a24',
+  card: '#ffffffcc',
+  item: '#f8fafccc',
+  highlight: 'inset 0 1px 0 #ffffffe6',
+  shadow: '0 1px 2px #0f172a0a, 0 12px 32px -16px #0f172a29',
+  accent: '#2563eb',
+  accentTop: '#3b82f6',
+  accentGlow: '#2563eb73',
+  soft: '#2563eb14',
+  softLine: '#2563eb2e',
+  icon: '#2563eb',
+  link: '#2563eb',
+  header: '#f8fafcb3',
+  pressed: '#f1f5f9',
+  /** The title's fade: `--title` on the site. */
+  titleFrom: '#020617',
+  titleTo: '#2563eb',
+  ok: '#047857',
+  okBg: '#ecfdf5cc',
+  okLine: '#a7f3d0',
+  bad: '#be123c',
+  badBg: '#fff1f2cc',
+  badLine: '#fecdd3',
+};
+
+export type Palette = typeof light;
+
+const dark: Palette = {
+  ...light,
+  bg: '#020617',
+  glow: '#3b82f62e',
+  dots: '#94a3b81a',
+  ink: '#cbd5e1',
+  strong: '#f8fafc',
+  muted: '#94a3b8',
+  label: '#cbd5e1',
+  line: '#94a3b81f',
+  lineStrong: '#94a3b838',
+  card: '#0f172a99',
+  item: '#1e293b66',
+  highlight: 'inset 0 1px 0 #ffffff0a',
+  shadow: '0 12px 40px -16px #000000cc',
+  accentGlow: '#3b82f666',
+  soft: '#3b82f61f',
+  softLine: '#60a5fa40',
+  icon: '#93c5fd',
+  link: '#93c5fd',
+  header: '#020617a6',
+  pressed: '#334155b3',
+  titleFrom: '#f8fafc',
+  titleTo: '#93c5fd',
+  ok: '#34d399',
+  okBg: '#10b9811a',
+  okLine: '#10b98166',
+  bad: '#fb7185',
+  badBg: '#f43f5e1a',
+  badLine: '#f43f5e66',
+};
+
+export const Palettes = { light, dark } as const;
+
+export type Scheme = keyof typeof Palettes;
+
+export function useScheme(): Scheme {
+  return useColorScheme() === 'dark' ? 'dark' : 'light';
+}
+
+export function useColors(): Palette {
+  return Palettes[useScheme()];
+}
+
+/**
+ * Builds a style sheet for each scheme once, and returns a hook that picks the current one.
+ * Used as `const useStyles = themedStyles((c) => ({ ... }))`.
+ */
+export function themedStyles<T extends StyleSheet.NamedStyles<T>>(make: (colors: Palette) => T) {
+  const sheets = {
+    light: StyleSheet.create(make(light)),
+    dark: StyleSheet.create(make(dark)),
+  };
+  return function useStyles() {
+    return sheets[useScheme()];
+  };
+}
+
+/** The blue tile behind the logo and the gradient on buttons. */
+export const AccentGradient = 'linear-gradient(140deg, #3b82f6, #1d4ed8)';
+
+export const Fonts = {
+  mono: 'monospace',
 } as const;
-
-/** Icon tile colors: a 20% tint behind a lighter stroke, as in `.row-icon.*`. */
-export const Accents = {
-  blue: { tile: 'rgba(59, 130, 246, 0.2)', icon: '#60a5fa' },
-  emerald: { tile: 'rgba(16, 185, 129, 0.2)', icon: '#34d399' },
-  purple: { tile: 'rgba(139, 92, 246, 0.2)', icon: '#a78bfa' },
-  amber: { tile: 'rgba(245, 158, 11, 0.2)', icon: '#fbbf24' },
-  rose: { tile: 'rgba(244, 63, 94, 0.2)', icon: '#fb7185' },
-} as const;
-
-export type Accent = keyof typeof Accents;
-
-/** DNS leak verdict and network badge colors, as in the site's `.verdict.*` and `.badge.*`. */
-export const Tones = {
-  ok: {
-    background: 'rgba(16, 185, 129, 0.1)',
-    border: 'rgba(16, 185, 129, 0.4)',
-    badge: Accents.emerald.tile,
-    text: Accents.emerald.icon,
-  },
-  leak: {
-    background: 'rgba(244, 63, 94, 0.1)',
-    border: 'rgba(244, 63, 94, 0.4)',
-    badge: Accents.rose.tile,
-    text: Accents.rose.icon,
-  },
-  unknown: {
-    background: 'rgba(148, 163, 184, 0.1)',
-    border: 'rgba(148, 163, 184, 0.4)',
-    badge: 'rgba(148, 163, 184, 0.2)',
-    text: Colors.slate300,
-  },
-} as const;
-
-export type Tone = keyof typeof Tones;
-
-export const PageGradient = `linear-gradient(to bottom right, ${Colors.slate900}, ${Colors.slate800}, ${Colors.slate900})`;
-
-export const CardShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
 
 export const Spacing = {
   one: 4,
@@ -64,12 +112,14 @@ export const Spacing = {
   three: 12,
   four: 16,
   five: 20,
-  six: 32,
-  seven: 48,
+  six: 24,
+  seven: 32,
 } as const;
 
 export const Radius = {
-  icon: 8,
-  row: 12,
-  card: 24,
+  tag: 999,
+  icon: 10,
+  button: 11,
+  item: 14,
+  card: 18,
 } as const;

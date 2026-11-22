@@ -1,14 +1,19 @@
 import type { ReactNode } from 'react';
-import Svg, { Circle, Line, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 /**
- * Lucide icons. Hash, Flag, MapPin, Building2 and Server are copied from the site's markup;
- * the rest are for controls the site doesn't have.
+ * Line icons. Globe, Sun, Moon, Flag, MapPin, Server and Resolvers are copied from the site's
+ * markup; the rest are Lucide icons for controls the site doesn't have.
  */
 
-type IconProps = { color: string; size?: number };
+export type IconProps = { color: string; size?: number; strokeWidth?: number };
 
-function Icon({ color, size = 24, children }: IconProps & { children: ReactNode }) {
+function Icon({
+  color,
+  size = 18,
+  strokeWidth = 1.8,
+  children,
+}: IconProps & { children: ReactNode }) {
   return (
     <Svg
       width={size}
@@ -16,7 +21,7 @@ function Icon({ color, size = 24, children }: IconProps & { children: ReactNode 
       viewBox="0 0 24 24"
       fill="none"
       stroke={color}
-      strokeWidth={2}
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round">
       {children}
@@ -24,13 +29,28 @@ function Icon({ color, size = 24, children }: IconProps & { children: ReactNode 
   );
 }
 
-export function HashIcon(props: IconProps) {
+export function GlobeIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Line x1="4" x2="20" y1="9" y2="9" />
-      <Line x1="4" x2="20" y1="15" y2="15" />
-      <Line x1="10" x2="8" y1="3" y2="21" />
-      <Line x1="16" x2="14" y1="3" y2="21" />
+      <Circle cx="12" cy="12" r="9" />
+      <Path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+    </Icon>
+  );
+}
+
+export function SunIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <Circle cx="12" cy="12" r="4" />
+      <Path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </Icon>
+  );
+}
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <Path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
     </Icon>
   );
 }
@@ -38,8 +58,7 @@ export function HashIcon(props: IconProps) {
 export function FlagIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-      <Line x1="4" x2="4" y1="22" y2="15" />
+      <Path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7" />
     </Icon>
   );
 }
@@ -53,27 +72,22 @@ export function MapPinIcon(props: IconProps) {
   );
 }
 
-export function BuildingIcon(props: IconProps) {
+export function ServerIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-      <Path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-      <Path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-      <Path d="M10 6h4" />
-      <Path d="M10 10h4" />
-      <Path d="M10 14h4" />
-      <Path d="M10 18h4" />
+      <Rect x="2" y="3" width="20" height="7" rx="2" />
+      <Rect x="2" y="14" width="20" height="7" rx="2" />
+      <Path d="M6 6.5h.01M6 17.5h.01" />
     </Icon>
   );
 }
 
-export function ServerIcon(props: IconProps) {
+/** The site's "DNS resolvers" icon. */
+export function ResolversIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
-      <Rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
-      <Line x1="6" x2="6.01" y1="6" y2="6" />
-      <Line x1="6" x2="6.01" y1="18" y2="18" />
+      <Path d="M12 3a15 15 0 0 1 4 9 15 15 0 0 1-4 9 15 15 0 0 1-4-9 15 15 0 0 1 4-9z" />
+      <Circle cx="12" cy="12" r="9" />
     </Icon>
   );
 }
@@ -81,9 +95,8 @@ export function ServerIcon(props: IconProps) {
 export function AlertIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Circle cx="12" cy="12" r="10" />
-      <Line x1="12" x2="12" y1="8" y2="12" />
-      <Line x1="12" x2="12.01" y1="16" y2="16" />
+      <Circle cx="12" cy="12" r="9" />
+      <Path d="M12 8v4M12 16h.01" />
     </Icon>
   );
 }
@@ -100,8 +113,7 @@ export function SearchIcon(props: IconProps) {
 export function XIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Path d="M18 6 6 18" />
-      <Path d="m6 6 12 12" />
+      <Path d="M18 6 6 18M6 6l12 12" />
     </Icon>
   );
 }
@@ -109,8 +121,7 @@ export function XIcon(props: IconProps) {
 export function ArrowLeftIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Path d="m12 19-7-7 7-7" />
-      <Path d="M19 12H5" />
+      <Path d="m12 19-7-7 7-7M19 12H5" />
     </Icon>
   );
 }
@@ -118,8 +129,8 @@ export function ArrowLeftIcon(props: IconProps) {
 export function ClockIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Circle cx="12" cy="12" r="10" />
-      <Path d="M12 6v6l4 2" />
+      <Circle cx="12" cy="12" r="9" />
+      <Path d="M12 7v5l3 2" />
     </Icon>
   );
 }
@@ -127,8 +138,8 @@ export function ClockIcon(props: IconProps) {
 export function CopyIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <Rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-      <Path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+      <Rect width="13" height="13" x="9" y="9" rx="2" />
+      <Path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
     </Icon>
   );
 }

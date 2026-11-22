@@ -1,17 +1,28 @@
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
-import { Colors } from '@/constants/theme';
+import { Palettes, useScheme } from '@/constants/theme';
+import { applySavedTheme } from '@/hooks/use-theme-preference';
 
-const theme = {
-  ...DarkTheme,
-  colors: { ...DarkTheme.colors, background: Colors.slate900, card: Colors.slate800 },
+// Before the first render, so a saved theme doesn't flash the other one.
+applySavedTheme();
+
+const themes = {
+  light: {
+    ...DefaultTheme,
+    colors: { ...DefaultTheme.colors, background: Palettes.light.bg, card: Palettes.light.bg },
+  },
+  dark: {
+    ...DarkTheme,
+    colors: { ...DarkTheme.colors, background: Palettes.dark.bg, card: Palettes.dark.bg },
+  },
 };
 
 export default function RootLayout() {
+  const scheme = useScheme();
   return (
-    <ThemeProvider value={theme}>
-      <StatusBar style="light" />
+    <ThemeProvider value={themes[scheme]}>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false }} />
     </ThemeProvider>
   );

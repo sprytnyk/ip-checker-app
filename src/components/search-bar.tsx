@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
+import { Button } from '@/components/card';
 import { SearchIcon, XIcon } from '@/components/icons';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing, themedStyles, useColors } from '@/constants/theme';
 import { looksLikeIp } from '@/lib/ip';
 
 type Props = {
@@ -11,8 +12,11 @@ type Props = {
 };
 
 export function SearchBar({ onSubmit, busy }: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   const [text, setText] = useState('');
   const [invalid, setInvalid] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   function submit() {
     const ip = text.trim();
@@ -26,96 +30,91 @@ export function SearchBar({ onSubmit, busy }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.field, invalid && styles.fieldInvalid]}>
-        <SearchIcon color={Colors.slate400} size={20} />
-        <TextInput
-          value={text}
-          onChangeText={(value) => {
-            setText(value);
-            setInvalid(false);
-          }}
-          onSubmitEditing={submit}
-          placeholder="Look up an IP address"
-          placeholderTextColor={Colors.slate500}
-          cursorColor={Colors.link}
-          selectionColor={Colors.link}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="off"
-          spellCheck={false}
-          inputMode="url"
-          returnKeyType="search"
-          accessibilityLabel="IP address to look up"
-          style={styles.input}
-        />
-        {text.length > 0 && (
-          <Pressable
-            onPress={() => {
-              setText('');
+      <View style={styles.row}>
+        <View
+          style={[styles.field, focused && styles.fieldFocused, invalid && styles.fieldInvalid]}>
+          <SearchIcon color={colors.muted} />
+          <TextInput
+            value={text}
+            onChangeText={(value) => {
+              setText(value);
               setInvalid(false);
             }}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel="Clear">
-            <XIcon color={Colors.slate400} size={18} />
-          </Pressable>
-        )}
+            onSubmitEditing={submit}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="Look up an IP address"
+            placeholderTextColor={colors.muted}
+            cursorColor={colors.accent}
+            selectionColor={colors.softLine}
+            selectionHandleColor={colors.accent}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="off"
+            spellCheck={false}
+            inputMode="url"
+            returnKeyType="search"
+            accessibilityLabel="IP address to look up"
+            style={styles.input}
+          />
+          {text.length > 0 && (
+            <Pressable
+              onPress={() => {
+                setText('');
+                setInvalid(false);
+              }}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Clear">
+              <XIcon color={colors.muted} size={17} />
+            </Pressable>
+          )}
+        </View>
+        <Button title="Look up" onPress={submit} disabled={busy} style={styles.button} />
       </View>
-      <Pressable
-        onPress={submit}
-        disabled={busy}
-        accessibilityRole="button"
-        style={({ pressed }) => [styles.button, (pressed || busy) && styles.buttonPressed]}>
-        <Text style={styles.buttonText}>Look up</Text>
-      </Pressable>
       {invalid && <Text style={styles.error}>Enter a valid IPv4 or IPv6 address.</Text>}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = themedStyles((c) => ({
   container: {
+    gap: Spacing.two,
+  },
+  row: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.three,
+    gap: Spacing.two,
   },
   field: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingHorizontal: Spacing.four,
-    backgroundColor: Colors.slate800,
+    gap: 10,
+    paddingHorizontal: 14,
+    backgroundColor: c.card,
     borderWidth: 1,
-    borderColor: Colors.slate700,
-    borderRadius: Radius.row,
+    borderColor: c.line,
+    borderRadius: Radius.item,
+    boxShadow: `${c.highlight}, ${c.shadow}`,
+  },
+  fieldFocused: {
+    borderColor: c.accent,
   },
   fieldInvalid: {
-    borderColor: Colors.error,
+    borderColor: c.bad,
   },
   input: {
     flex: 1,
-    minHeight: 52,
-    fontSize: 16,
-    color: Colors.white,
+    minHeight: 48,
+    fontSize: 15,
+    color: c.strong,
   },
   button: {
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.five,
-    backgroundColor: Colors.blue600,
-    borderRadius: Radius.row,
-  },
-  buttonPressed: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.white,
+    borderRadius: Radius.item,
   },
   error: {
-    width: '100%',
-    fontSize: 14,
-    color: Colors.error,
+    paddingHorizontal: Spacing.one,
+    fontSize: 13,
+    color: c.bad,
   },
-});
+}));

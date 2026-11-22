@@ -5,10 +5,11 @@
 Android app for [ip.sprytnyk.dev](https://ip.sprytnyk.dev), with the same design as the site. It shows your
 public IPv4 and IPv6 addresses, country, city and network organisation, and it can look up any
 other address. Its DNS leak test lists the resolvers that look up names for you and flags the
-ones outside your network.
+ones outside your network. It follows your phone's light or dark mode, and the button in the top
+bar switches between them.
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="300" alt="Looking up 1.1.1.1: IPv4, country, city and organisation, with recent lookups below" />
+  <img src="docs/screenshots/home-dark.png" width="300" alt="Looking up 1.1.1.1 in the dark theme" />
 </p>
 
 ## Privacy
@@ -21,8 +22,8 @@ Neither the app nor its backend collects your data.
   backend's own nameserver answers them. Footer links open in a browser only when you tap them.
 - **Local GeoIP.** The [backend](https://github.com/sprytnyk/ip) answers from local MaxMind
   GeoLite2 databases, so it never sends your address to a third-party lookup service.
-- **History stays on your phone.** The app keeps recent lookups only on your phone, and you
-  can clear them at any time.
+- **History stays on your phone.** The app keeps recent lookups and your theme choice only on
+  your phone, and you can clear the lookups at any time.
 - **Self-hostable.** The backend is open source. Point the app at your own instance by changing
   `API_HOST` in `src/lib/api.ts`.
 

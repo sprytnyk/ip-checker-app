@@ -55,7 +55,7 @@ The project uses npm (`package-lock.json`) and Node.js 26 (`.nvmrc`), so run too
 - **README.** Compare `git log <last-tag>..HEAD` with `README.md` (the intro, Privacy, Develop
   and Checks sections). If a user-visible change is missing from the README, add it in a
   `docs(readme): ...` commit. Changes to what the app sends, stores or asks permission for go
-  in Privacy. Only refresh `docs/screenshots/home.png` if the user asks.
+  in Privacy. Only refresh `docs/screenshots/home-dark.png` if the user asks.
 
 ## 2. Version
 

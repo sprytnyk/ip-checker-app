@@ -1,6 +1,6 @@
 # What's My IP
 
-![AI Generated](https://img.shields.io/badge/AI-generated-orange)
+![AI-assisted](https://img.shields.io/badge/AI-assisted-orange)
 
 Android app for [ip.sprytnyk.dev](https://ip.sprytnyk.dev), with the same design as the site. It shows your
 public IPv4 and IPv6 addresses, country, city and network organisation, and it can look up any
